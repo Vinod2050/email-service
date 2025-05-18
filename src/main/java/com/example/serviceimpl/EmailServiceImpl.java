@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -45,14 +46,23 @@ public class EmailServiceImpl implements EmailService {
 
             helper.setTo(emailDTO.getTo());
             helper.setSubject(emailDTO.getSubject());
-            helper.setText(content, true);
 
+            if (emailDTO.getAttachmentData() != null && emailDTO.getAttachmentName() != null) {
+                helper.addAttachment(
+                    emailDTO.getAttachmentName(),
+                    new ByteArrayDataSource(emailDTO.getAttachmentData(), "application/pdf")
+                );
+            }
+
+            helper.setText(content, true);
             mailSender.send(message);
+
             log.info("Email sent successfully to {}", emailDTO.getTo());
         } catch (Exception e) {
             log.error("Error sending email to {}: {}", emailDTO.getTo(), e.getMessage());
         }
     }
+
 
     
     private String loadTemplate(String templateName, String recipientName) throws IOException {
@@ -62,6 +72,9 @@ public class EmailServiceImpl implements EmailService {
     }
     
     private String decideTemplate(EmailDTO emailDTO) {
+    	if(emailDTO.getSubject().contains("Sanction")) {
+    		return "sanction-status-email.html";
+    	}
         if (emailDTO.getSubject().contains("Eligible")) {
             return "enquiry-Approved-email.html";
         } else if (emailDTO.getSubject().contains("Welcome")) {

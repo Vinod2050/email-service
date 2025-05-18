@@ -11,4 +11,6 @@ public class EmailDTO {
     private String body;
     private String enquiryId;
     private String firstName;
+	private String attachmentName;
+	private byte[] attachmentData;
 }

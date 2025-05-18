@@ -27,6 +27,10 @@ public ResponseEntity<String> sendEmail(@RequestBody EmailDTO emailDTO) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                              .body("Failed to send email: " + e.getMessage());
     }
+    
+    
 }
+
+
 
 }
